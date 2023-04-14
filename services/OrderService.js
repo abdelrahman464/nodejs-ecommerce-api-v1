@@ -7,6 +7,7 @@ const factory = require("./handllerFactory");
 
 const Order = require("../models/orderModel");
 const Cart = require("../models/cartModel");
+const User = require("../models/userModel");
 const Product = require("../models/productModel");
 
 //@desc create cash order
@@ -148,9 +149,38 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", session });
 });
 
-//@desc Get checkout session from stripe and send it as response
-//@route GET /api/v1/orders/checkout-session/cartId
-//@access protected/user
+const createCardOrder = async (session) => {
+  const cartId = session.client_reference_id;
+  const shippingAddress = session.metadata;
+  const orderPrice = session.display_items[0].unit_amount / 100;
+
+  const cart = await Cart.findById(cartId);
+  const user = await User.findOne({ email: session.customer_email });
+
+  //3)create order with default payment method cash
+  const order = await Order.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: orderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: "card",
+  });
+  //4) after creating order  decerement product quantity and increment product sold
+  if (order) {
+    const bulkOptions = cart.cartItems.map((item) => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { quantity: -item.quantity, sold: +item.quantity } },
+      },
+    }));
+    await Product.bulkWrite(bulkOptions, {});
+
+    //5)clear cart depend on cartId
+    await Cart.findByIdAndDelete(cartId);
+  }
+};
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
   const sig = req.headers["stripe-signature"];
 
@@ -166,7 +196,8 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
   if (event.type === "checkout.session.completed") {
-    console.log("Create order here....");
-    console.log(event.data.object.client_reference_id);
+    createCardOrder(event.data);
   }
+
+  res.status(200).json({ received: true });
 });
