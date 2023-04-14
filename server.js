@@ -16,6 +16,8 @@ const ApiError = require("./utils/apiError");
 //GLobal error handling middleware for express
 const globalError = require("./middlewares/errorMiddleware");
 
+const { webhookCheckout } = require("./services/OrderService");
+
 dotenv.config({ path: "config.env" });
 
 //connect with database
@@ -28,6 +30,13 @@ app.options("*", cors());
 
 // compress all responses
 app.use(compression());
+
+//checkout webhook
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout
+);
 
 //middlewares
 app.use(express.json());
