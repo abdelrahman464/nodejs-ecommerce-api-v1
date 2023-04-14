@@ -1,5 +1,6 @@
 const path = require("path");
 const express = require("express");
+const mongoose = require("mongoose");
 //middleware
 const morgan = require("morgan");
 //env file
@@ -22,6 +23,7 @@ dotenv.config({ path: "config.env" });
 
 //connect with database
 dbConnection();
+mongoose.set('strictQuery', false);
 //express app
 const app = express();
 //enable other domains access your application
