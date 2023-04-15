@@ -6,6 +6,9 @@ const morgan = require("morgan");
 //env file
 const cors = require("cors");
 const compression = require("compression");
+
+const rateLimit = require("express-rate-limit");
+
 const dotenv = require("dotenv");
 //database
 const dbConnection = require("./config/database");
@@ -23,7 +26,7 @@ dotenv.config({ path: "config.env" });
 
 //connect with database
 dbConnection();
-mongoose.set('strictQuery', false);
+mongoose.set("strictQuery", false);
 //express app
 const app = express();
 //enable other domains access your application
@@ -41,7 +44,12 @@ app.post(
 );
 
 //middlewares
-app.use(express.json());
+//pasring the comming data to json
+app.use(
+  express.json({
+    limit: "100kp",
+  })
+);
 //serve static files inside 'uploads'
 app.use(express.static(path.join(__dirname, "uploads")));
 
@@ -49,6 +57,17 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log(process.env.NODE_ENV);
 }
+
+// Limit each IP to 100 requests per `window` (here, per 15 minutes)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message:
+    "Too many accounts created from this IP, please try again after an hour",
+});
+
+// Apply the rate limiting middleware to all requests
+app.use("/api", limiter);
 
 // Mount Routes
 mountRoutes(app);
