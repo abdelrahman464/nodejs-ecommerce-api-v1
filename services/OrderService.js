@@ -182,7 +182,7 @@ const createCardOrder = async (session) => {
   }
 };
 
-//@desc this webhook will run when the stripe payment success paied 
+//@desc this webhook will run when the stripe payment success paied
 //@route POST /webhook-checkout
 //@access protected/user
 exports.webhookCheckout = asyncHandler(async (req, res, next) => {
@@ -200,7 +200,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
   if (event.type === "checkout.session.completed") {
-    createCardOrder(event.data);
+    createCardOrder(event.data.object);
   }
 
   res.status(200).json({ received: true });
