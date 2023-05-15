@@ -8,8 +8,6 @@ const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 
-
-
 //upload Singel image
 exports.uploadProfileImage = uploadSingleImage("profileImg");
 //image processing
@@ -21,7 +19,6 @@ exports.resizeImage = asyncHandler(async (req, res, next) => {
       .resize(600, 600)
       .toFormat("jpeg")
       .jpeg({ quality: 95 })
-      .rotate(90)
       .toFile(`uploads/users/${filename}`);
 
     //save image into our db
@@ -63,8 +60,6 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new ApiError(`No document For this id ${req.params.id}`, 404));
   }
-  //trigger "save" event when update the document
-  user.save();
 
   res.status(200).json({ data: user });
 });
@@ -139,12 +134,12 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 //@access private/protect
 exports.deleteLoggedUser = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: false });
-  res.status(204).json({data:"success"});
+  res.status(204).json({ data: "success" });
 });
 //@desc activate logged user
 //@route PUT /api/v1/user/activeMe
 //@access private/protect
 exports.activeLoggedUser = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: true });
-  res.status(204).json({data:"success"});
+  res.status(204).json({ data: "success" });
 });
