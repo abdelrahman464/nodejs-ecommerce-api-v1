@@ -1,9 +1,35 @@
 const bcrypt = require("bcryptjs");
+const sharp = require("sharp");
+const { v4: uuidv4 } = require("uuid");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
 const factory = require("./handllerFactory");
 const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+
+
+
+//upload Singel image
+exports.uploadProfileImage = uploadSingleImage("profileImg");
+//image processing
+exports.resizeImage = asyncHandler(async (req, res, next) => {
+  const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
+
+  if (req.file) {
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .rotate(90)
+      .toFile(`uploads/users/${filename}`);
+
+    //save image into our db
+    req.body.profileImg = filename;
+  }
+
+  next();
+});
 //@desc get list of user
 //@route GET /api/v1/users
 //@access private
@@ -37,6 +63,9 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new ApiError(`No document For this id ${req.params.id}`, 404));
   }
+  //trigger "save" event when update the document
+  user.save();
+
   res.status(200).json({ data: user });
 });
 

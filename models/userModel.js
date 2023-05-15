@@ -67,5 +67,23 @@ userShcema.pre("save", async function (next) {
   next();
 });
 
+const setProfileImageURL = (doc) => {
+  //return image base url + iamge name
+  if (doc.profileImg) {
+    const profileImageUrl = `${process.env.BASE_URL}/users/${doc.profileImg}`;
+    doc.profileImg = profileImageUrl;
+  }
+};
+//after initializ the doc in db
+// check if the document contains image
+// it work with findOne,findAll,update
+userShcema.post("init", (doc) => {
+  setProfileImageURL(doc);
+});
+// it work with create
+userShcema.post("save", (doc) => {
+  setProfileImageURL(doc);
+});
+
 const User = mongoose.model("User", userShcema);
 module.exports = User;

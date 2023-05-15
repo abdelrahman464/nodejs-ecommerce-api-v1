@@ -19,7 +19,9 @@ const {
   getLoggedUserData,
   updateLoggedUserPassword,
   updateLoggedUserData,
-  deleteLoggedUser
+  deleteLoggedUser,
+  uploadProfileImage,
+  resizeImage,
 } = require("../services/userService");
 
 const router = express.Router();
@@ -54,6 +56,8 @@ router
   .post(
     authServices.protect,
     authServices.allowedTo("admin"),
+    uploadProfileImage,
+    resizeImage,
     createUserValidator,
     createUser
   );
@@ -68,6 +72,8 @@ router
   .put(
     authServices.protect,
     authServices.allowedTo("admin"),
+    uploadProfileImage,
+    resizeImage,
     updateUserValidator,
     updateUser
   )
