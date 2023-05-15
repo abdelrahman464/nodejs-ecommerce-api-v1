@@ -26,7 +26,7 @@ dotenv.config({ path: "config.env" });
 
 //connect with database
 dbConnection();
-mongoose.set("strictQuery", false);
+mongoose.set("strictQuery", true);
 //express app
 const app = express();
 //enable other domains access your application
