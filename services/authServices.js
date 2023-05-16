@@ -124,9 +124,9 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
   //3-send the reset code via email
   try {
     await sendEmail({
-      email: user.email,
+      to: user.email,
       subject: "Your Password Reset code (valid for 10 min)",
-      message: emailMessage,
+      text: emailMessage,
     });
   } catch (err) {
     user.passwordResetCode = undefined;

@@ -22,7 +22,7 @@ const loginLimiter = rateLimit({
 // create a limiter for forgot password requests
 const forgotPasswordLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // limit each IP to 3 forgot password requests per windowMs
+  max: 10, // limit each IP to 3 forgot password requests per windowMs
   message: "Too many forgot password attempts. Please try again later.",
 });
 
