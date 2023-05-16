@@ -134,8 +134,6 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     user.passwordResetVerified = undefined;
 
     await user.save();
-  
-    console.log(err)
     return next(
       new ApiError(
         "there is a problem with sending Email with your reset code",
