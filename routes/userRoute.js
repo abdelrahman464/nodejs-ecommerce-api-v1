@@ -20,6 +20,7 @@ const {
   updateLoggedUserPassword,
   updateLoggedUserData,
   deleteLoggedUser,
+  activeLoggedUser,
   uploadProfileImage,
   resizeImage,
 } = require("../services/userService");
@@ -28,6 +29,7 @@ const router = express.Router();
 
 router.get("/getMe", authServices.protect, getLoggedUserData, getUser);
 router.delete("/deleteMe", authServices.protect, deleteLoggedUser);
+router.put("/activeMe", authServices.protect, activeLoggedUser);
 router.put(
   "/changeMyPassword",
   authServices.protect,
@@ -37,6 +39,8 @@ router.put(
 router.put(
   "/changeMyData",
   authServices.protect,
+  uploadProfileImage,
+  resizeImage,
   updateLoggedUserValidator,
   updateLoggedUserData
 );

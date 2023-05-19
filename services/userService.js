@@ -122,6 +122,7 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
+      profileImg: req.body.profileImg,
     },
     {
       new: true,
@@ -134,12 +135,12 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 //@access private/protect
 exports.deleteLoggedUser = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: false });
-  res.status(204).json({ data: "success" });
+  res.status(204).send();
 });
 //@desc activate logged user
 //@route PUT /api/v1/user/activeMe
 //@access private/protect
 exports.activeLoggedUser = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: true });
-  res.status(204).json({ data: "success" });
+  res.status(201).json({ data: "success" });
 });
