@@ -37,13 +37,13 @@ router
   );
 router
   .route("/:id")
-  .get(
+  .get(getsubCategoryValidator, getSubCategory)
+  .put(
     authServices.protect,
     authServices.allowedTo("admin", "manager"),
-    getsubCategoryValidator,
-    getSubCategory
+    updateCategroyValidator,
+    updateSubCategory
   )
-  .put(updateCategroyValidator, updateSubCategory)
   .delete(
     authServices.protect,
     authServices.allowedTo("admin"),

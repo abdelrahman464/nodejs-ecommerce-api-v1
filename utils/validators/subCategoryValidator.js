@@ -52,13 +52,23 @@ exports.updateCategroyValidator = [
     req.body.slug = slugify(val);
     return true;
   }),
+  check("category")
+    .notEmpty()
+    .withMessage("subCateogry must be belong to category")
+    .isMongoId()
+    .withMessage("Invalid Category id format")
+    .custom((categoryId) =>
+      Category.findById(categoryId).then((cateogry) => {
+        if (!cateogry) {
+          return Promise.reject(
+            new Error(`No Category for this id : ${categoryId}`)
+          );
+        }
+      })
+    ),
   validatorMiddleware,
 ];
 exports.deleteCategroyValidator = [
-  check("id")
-    .isMongoId()
-    .withMessage("Invalid subCategory id format")
-    .notEmpty()
-    .withMessage("subCateogry must be belong to category"),
+  check("id").isMongoId().withMessage("Invalid subCategory id format"),
   validatorMiddleware,
 ];
