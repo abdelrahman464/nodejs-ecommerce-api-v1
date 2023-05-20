@@ -51,7 +51,7 @@ const productSchema = new mongoose.Schema(
     subCategories: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "SubCategory",
+        ref: "subCategory",
       },
     ],
     brand: {
@@ -68,10 +68,11 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timeseries: true ,
+  {
+    timeseries: true,
     // to enable vitual population
-    toJSON:{virtuals: true},
-    toObject:{virtuals: true},
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   }
 );
 
@@ -86,9 +87,14 @@ productSchema.virtual("reviews", {
 productSchema.pre(/^find/, function (next) {
   // this => query
   this.populate({
+    path: "subCategories",
+    select: "name -_id",
+  });
+  this.populate({
     path: "category",
     select: "name -_id",
   });
+
   next();
 });
 
