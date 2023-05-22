@@ -46,6 +46,8 @@ router.put(
 );
 router.put(
   "/changePassword/:id",
+  authServices.protect,
+  authServices.allowedTo("admin"),
   changeUserPasswordValidator,
   changeUserPassword
 );
