@@ -3,7 +3,7 @@ const factory = require("./handllerFactory");
 
 
   
-//filter subCategories in specefic category by categoryId
+
 // GET products/:productId/reviews
 exports.createFilterObj = (req, res, next) => {
   let filterObject = {};
