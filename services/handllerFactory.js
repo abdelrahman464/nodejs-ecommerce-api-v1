@@ -13,7 +13,7 @@ exports.updateOne = (Model) =>
       );
     }
     //trigger "save" event when update the document
-    document.save();
+    // document.save();
     res.status(200).json({ data: document });
   });
 
