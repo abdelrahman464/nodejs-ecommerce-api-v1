@@ -2,11 +2,11 @@ const Coupon = require("../models/couponModel");
 const factory = require("./handllerFactory");
 //@desc get list of coupons
 //@route GET /api/v1/coupons
-//@access public
+//@access private/admin-manager
 exports.getCoupons = factory.getALl(Coupon);
 //@desc get specific coupon by id
 //@route GET /api/v1/coupon/:id
-//@access public
+//@access private/admin-manager
 exports.getCoupon = factory.getOne(Coupon);
 //@desc create coupon
 //@route POST /api/v1/coupons

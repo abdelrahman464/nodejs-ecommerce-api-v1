@@ -8,7 +8,16 @@ exports.addProductToCartValidator = [
     .notEmpty()
     .withMessage("Product id is required")
     .isMongoId()
-    .withMessage("Invalid ID format"),
+    .withMessage("Invalid ID format")
+    .custom((productId) =>
+      Product.findById(productId).then((product) => {
+        if (!product) {
+          return Promise.reject(
+            new Error(`No product for this id : ${productId}`)
+          );
+        }
+      })
+    ),
   check("color")
     .optional()
     .custom(async (val, { req }) => {
@@ -46,7 +55,7 @@ exports.updateCartItemQuantityValidator = [
   }),
   validatorMiddleware,
 ];
-exports.applayCouponValidator=[
-  check("coupon").notEmpty()
-  .withMessage("coupon is required"),
-  validatorMiddleware,]
+exports.applayCouponValidator = [
+  check("coupon").notEmpty().withMessage("coupon is required"),
+  validatorMiddleware,
+];

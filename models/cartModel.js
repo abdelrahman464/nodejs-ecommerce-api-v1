@@ -26,4 +26,14 @@ const cartSchema = mongoose.Schema(
   { timestamps: true }
 );
 
+// ^find => it mean if part of of teh word contains find
+cartSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "user",
+    select: "name -_id",
+  });
+
+  next();
+});
+
 module.exports = mongoose.model("Cart", cartSchema);
