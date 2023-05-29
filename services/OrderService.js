@@ -199,7 +199,7 @@ const createCardOrder = async (session) => {
     the order Price is : { ${orderPrice} } `  ;
     //3-send the reset code via email
     await sendEmail({
-      to: user.email,
+      to: session.customer_email,
       subject: "Your Order has been created successfully",
       text: emailMessage,
     });
