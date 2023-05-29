@@ -57,15 +57,15 @@ exports.filterOrderForLoggedUser = asyncHandler(async (req, res, next) => {
   next();
 });
 //@desc get all orders
-//@route GET /api/v1/orders/:cartId
+//@route GET /api/v1/orders
 //@access protected/user-admin-manager
 exports.findAllOrders = factory.getALl(Order);
 //@desc get specifi orders
-//@route GET /api/v1/orders/cartId
+//@route GET /api/v1/orders/:orderId
 //@access protected/user-admin-manager
 exports.findSpecificOrder = factory.getOne(Order);
 //@desc update order paid status to paid
-//@route PUT /api/v1/orders/:id/pay
+//@route PUT /api/v1/orders/:orderId/pay
 //@access protected/admin-manager
 exports.updateOrderToPay = asyncHandler(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
@@ -83,7 +83,7 @@ exports.updateOrderToPay = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", data: updatedOrder });
 });
 //@desc update order delivered status to delivered
-//@route PUT /api/v1/orders/:id/deliver
+//@route PUT /api/v1/orders/:orderId/deliver
 //@access protected/admin-manager
 exports.updateOrderToDelivered = asyncHandler(async (req, res, next) => {
   const order = await Order.findById(req.params.id);

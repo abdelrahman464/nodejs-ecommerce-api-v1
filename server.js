@@ -47,7 +47,7 @@ app.post(
 //pasring the comming data to json
 app.use(
   express.json({
-    limit: "150kp",
+    limit: "250kp",
   })
 );
 //serve static files inside 'uploads'

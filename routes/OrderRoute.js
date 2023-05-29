@@ -28,7 +28,7 @@ router
     filterOrderForLoggedUser,
     findAllOrders
   );
-router.route("/:id").get(authServices.allowedTo("user"), findSpecificOrder);
+router.route("/:id").get(authServices.allowedTo("admin"), findSpecificOrder);
 router
   .route("/:id/pay")
   .put(authServices.allowedTo("admin", "manager"), updateOrderToPay);
