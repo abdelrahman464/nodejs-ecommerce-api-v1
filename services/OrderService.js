@@ -9,6 +9,7 @@ const Order = require("../models/orderModel");
 const Cart = require("../models/cartModel");
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
+const sendEmail = require("../utils/sendEmail");
 
 //@desc create cash order
 //@route POST /api/v1/orders/:cartId
@@ -48,6 +49,19 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
     await Product.bulkWrite(bulkOptions, {});
     //5)clear cart depend on cartId
     await Cart.findByIdAndDelete(cartId);
+
+    const userOrder = await User.findById(req.user._id);
+    const emailMessage = `Hi ${userOrder.name},\n Your order has been created successfully \n 
+    you have to wait for 2 days at least before the order arrives to you \n
+    the order Price is : { ${totalOrderPrice} } containing the order cartPrice :${cartPrice}
+    and order shipping price : ${shippingPrice} 
+    and order tax price : ${taxPrice}`  ;
+    //3-send the reset code via email
+    await sendEmail({
+      to: userOrder.email,
+      subject: "Your Order has been created successfully",
+      text: emailMessage,
+    });
   }
   res.status(201).json({ status: "success", data: order });
 });
@@ -154,9 +168,6 @@ const createCardOrder = async (session) => {
   const shippingAddress = session.metadata;
   const orderPrice = session.amount_total / 100;
 
-
-
-
   const cart = await Cart.findById(cartId);
   const user = await User.findOne({ email: session.customer_email });
 
@@ -182,6 +193,18 @@ const createCardOrder = async (session) => {
 
     //5)clear cart depend on cartId
     await Cart.findByIdAndDelete(cartId);
+
+    const emailMessage = `Hi ${user.name},\n Your order has been created successfully \n 
+    you have to wait for 2 days at least before the order arrives to you \n
+    the order Price is : { ${orderPrice} } `  ;
+    //3-send the reset code via email
+    await sendEmail({
+      to: user.email,
+      subject: "Your Order has been created successfully",
+      text: emailMessage,
+    });
+
+
   }
 };
 
