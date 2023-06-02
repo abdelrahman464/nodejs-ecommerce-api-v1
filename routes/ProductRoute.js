@@ -5,6 +5,7 @@ const {
   updateProductValidator,
   deleteProductValidator,
 } = require("../utils/validators/productValidator");
+const convertToArray = require("../middlewares/convertToArraysubCategoriesAndColors");
 const authServices = require("../services/authServices");
 const {
   getProducts,
@@ -31,6 +32,7 @@ router
     authServices.allowedTo("admin", "manager"),
     uploadProductImages,
     resizeProductImages,
+    convertToArray,
     createProductValidator,
     createProduct
   );
@@ -40,8 +42,9 @@ router
   .put(
     authServices.protect,
     authServices.allowedTo("admin", "manager"),
-    // uploadProductImages,
-    // resizeProductImages,
+    uploadProductImages,
+    resizeProductImages,
+    convertToArray,
     updateProductValidator,
     updateProduct
   )
