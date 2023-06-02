@@ -29,9 +29,9 @@ router
   .post(
     authServices.protect,
     authServices.allowedTo("admin", "manager"),
-    createProductValidator,
     uploadProductImages,
     resizeProductImages,
+    createProductValidator,
     createProduct
   );
 router
@@ -40,9 +40,9 @@ router
   .put(
     authServices.protect,
     authServices.allowedTo("admin", "manager"),
+    // uploadProductImages,
+    // resizeProductImages,
     updateProductValidator,
-    uploadProductImages,
-    resizeProductImages,
     updateProduct
   )
   .delete(
