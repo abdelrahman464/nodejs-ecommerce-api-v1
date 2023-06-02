@@ -102,7 +102,6 @@ exports.createProductValidator = [
           subcategories.forEach((subCategory) => {
             subCategoriesIdsInDB.push(subCategory._id.toString());
           });
-          console.log(val)
           // check if subcategories ids in db include subcategories in req.body (true)
           const checker = (target, arr) => target.every((v) => arr.includes(v));
           if (!checker(val, subCategoriesIdsInDB)) {
