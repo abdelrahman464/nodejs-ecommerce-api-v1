@@ -16,14 +16,12 @@ const {
   resizeProductImages,
 } = require("../services/productService");
 
-
 // nested routes
-const reviewsRoute =require("./reviewRoute");
+const reviewsRoute = require("./reviewRoute");
 
 const router = express.Router();
 
-router.use("/:productId/reviews",reviewsRoute );
-
+router.use("/:productId/reviews", reviewsRoute);
 
 router
   .route("/")
@@ -31,9 +29,9 @@ router
   .post(
     authServices.protect,
     authServices.allowedTo("admin", "manager"),
+    createProductValidator,
     uploadProductImages,
     resizeProductImages,
-    createProductValidator,
     createProduct
   );
 router
@@ -42,12 +40,16 @@ router
   .put(
     authServices.protect,
     authServices.allowedTo("admin", "manager"),
+    updateProductValidator,
     uploadProductImages,
     resizeProductImages,
-    updateProductValidator,
     updateProduct
   )
-  .delete( authServices.protect,
-    authServices.allowedTo("admin"),deleteProductValidator, deleteProduct);
+  .delete(
+    authServices.protect,
+    authServices.allowedTo("admin"),
+    deleteProductValidator,
+    deleteProduct
+  );
 
 module.exports = router;

@@ -4,6 +4,7 @@ const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 const Category = require("../../models/categoryModel");
 const SubCategory = require("../../models/subCategoryModel");
 const Brand = require("../../models/brandModel");
+const ApiError = require("../apiError");
 
 exports.createProductValidator = [
   check("title")
@@ -55,7 +56,7 @@ exports.createProductValidator = [
     .withMessage("availableColors should be array of string"),
   check("imageCover").notEmpty().withMessage("Product imageCover is required"),
   check("images")
-    .optional() 
+    .optional()
     .isArray()
     .withMessage("images should be array of string"),
   check("category")
@@ -65,10 +66,10 @@ exports.createProductValidator = [
     .withMessage("Invalid ID format")
     // before i add product to category i must check if category is in database
     .custom((categoryId) =>
-      Category.findById(categoryId).then((cateogry) => {
-        if (!cateogry) {
+      Category.findById(categoryId).then((category) => {
+        if (!category) {
           return Promise.reject(
-            new Error(`No Category for this id : ${categoryId}`)
+            new ApiError(`No category for this id: ${categoryId}`, 404)
           );
         }
       })
@@ -82,12 +83,13 @@ exports.createProductValidator = [
     //check subcategories exist in databse befor add product to subcats
     // _id:{exists:true} => filter subcats by id => gives me subcats that have id
     //_id:{exists:true,$in :subCategoriesIds} =>  first i checked if the subcats have id second i checked if these ids in the array of subcats that i send in body
-    .custom((subCategoriesIds) =>
-      SubCategory.find({ _id: { $exists: true, $in: subCategoriesIds } }).then(
+    .custom((subcategoriesIds) =>
+      SubCategory.find({ _id: { $exists: true, $in: subcategoriesIds } }).then(
         (result) => {
-          //Length result  must equal  subcats in body
-          if (result.length < 1 || result.length !== subCategoriesIds.length) {
-            return Promise.reject(new Error(`Invalid subCateogries Ids`));
+          if (result.length < 1 || result.length !== subcategoriesIds.length) {
+            return Promise.reject(
+              new ApiError(`Invalid subcategories Ids`, 403)
+            );
           }
         }
       )
@@ -95,17 +97,17 @@ exports.createProductValidator = [
     // make sure that subcategories from body belongs to cateogry from body
     .custom((val, { req }) =>
       SubCategory.find({ category: req.body.category }).then(
-        (subcategories) => {
+        (subcategories) => { 
           const subCategoriesIdsInDB = [];
           subcategories.forEach((subCategory) => {
             subCategoriesIdsInDB.push(subCategory._id.toString());
           });
-
+          console.log(val)
           // check if subcategories ids in db include subcategories in req.body (true)
           const checker = (target, arr) => target.every((v) => arr.includes(v));
           if (!checker(val, subCategoriesIdsInDB)) {
             return Promise.reject(
-              new Error(`subcategories not belong to category `)
+              new ApiError(`subcategories not belong to category`,403)
             );
           }
         }
