@@ -61,9 +61,9 @@ if (process.env.NODE_ENV === "development") {
 // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 1000,
   message:
-    "Too many accounts created from this IP, please try again after an 15minute interval",
+    "Too many requsts created from this IP, please try again after an 15minute interval",
 });
 // Apply the rate limiting middleware to all requests
 app.use("/api", limiter);
