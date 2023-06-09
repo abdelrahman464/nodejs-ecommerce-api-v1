@@ -32,7 +32,10 @@ cartSchema.pre(/^find/, function (next) {
     path: "user",
     select: "name -_id",
   });
-
+  this.populate({
+    path: "cartItems",
+    populate: "product",
+  });
   next();
 });
 
