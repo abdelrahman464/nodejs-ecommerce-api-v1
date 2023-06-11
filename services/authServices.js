@@ -221,9 +221,8 @@ passport.use(
   new GoogleStategy(
     {
       //options
-      clientID:
-        "583170042384-j2022sr5gialgojhn0p9q0og9mc97f03.apps.googleusercontent.com",
-      clientSecret: "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",
+      clientID: process.env.CLIENTID,
+      clientSecret: process.env.CLIENTSECRET,
       callbackURL: "/api/v1/auth/google/redirect",
     },
     async (accessToken, refreshToken, profile, done) => {

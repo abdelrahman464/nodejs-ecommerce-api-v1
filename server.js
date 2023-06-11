@@ -11,6 +11,9 @@ const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 
 const dotenv = require("dotenv");
+
+dotenv.config({ path: "config.env" });
+
 //database
 const dbConnection = require("./config/database");
 //route
@@ -22,8 +25,6 @@ const ApiError = require("./utils/apiError");
 const globalError = require("./middlewares/errorMiddleware");
 
 const { webhookCheckout } = require("./services/OrderService");
-
-dotenv.config({ path: "config.env" });
 
 //connect with database
 dbConnection();
