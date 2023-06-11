@@ -229,6 +229,7 @@ passport.use(
       try {
         //check if user exist
         const user = await User.findOne({ googleId: profile.id });
+
         if (user) {
           // Pass the person object to the done function
           return done(null, user);
@@ -242,7 +243,7 @@ passport.use(
           }
           if (!cuurentUser) {
             // Create a new user if not found
-            const newUser = User.create({
+            const newUser = await User.create({
               googleId: profile.id,
               name: profile.displayName,
               email: profile.emails[0].value,
