@@ -18,6 +18,11 @@ const userShcema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
+    googleId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     phone: String,
     profileImg: String,
     password: {

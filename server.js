@@ -1,6 +1,7 @@
 const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
+const passport = require("passport");
 //middleware
 const morgan = require("morgan");
 //env file
@@ -32,6 +33,8 @@ const app = express();
 //enable other domains access your application
 app.use(cors());
 app.options("*", cors());
+
+app.use(passport.initialize());
 
 // compress all responses
 app.use(compression());
