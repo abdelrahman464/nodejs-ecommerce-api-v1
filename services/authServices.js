@@ -222,8 +222,8 @@ passport.use(
     {
       //options
       clientID:
-        "604626220788-07jn4ujbbegononldm4la3runi9uqh5h.apps.googleusercontent.com",
-      clientSecret: "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",
+        "583170042384-j2022sr5gialgojhn0p9q0og9mc97f03.apps.googleusercontent.com",
+      clientSecret: "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",
       callbackURL: "/api/v1/auth/google/redirect",
     },
     async (accessToken, refreshToken, profile, done) => {
