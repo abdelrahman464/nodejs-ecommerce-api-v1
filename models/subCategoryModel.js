@@ -21,6 +21,15 @@ const subCategorySchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+// ^find => it mean if part of of teh word contains find
+subCategorySchema.pre(/^find/, function (next) {
+  // this => query
+  this.populate({
+    path: "category",
+    select: "name -_id",
+  });
+  next();
+});
 
 const subCategory =  mongoose.model("subCategory", subCategorySchema);
 module.exports = subCategory;
