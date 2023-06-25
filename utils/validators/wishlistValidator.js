@@ -1,19 +1,22 @@
-const { check } = require("express-validator");
+const { body } = require("express-validator");
 const Product = require("../../models/productModel");
+const ApiError = require("../apiError");
+const validatorMiddleware = require("../../middlewares/validatorMiddleware");
 
 exports.addProductToWishlistValidator = [
-  check("productId")
+  body("productId")
     .notEmpty()
     .withMessage("Product required")
     .isMongoId()
     .withMessage("Invalid ID format")
-    .custom((productId) => {
+    .custom((productId) =>
       Product.findById(productId).then((product) => {
         if (!product) {
           return Promise.reject(
-            new Error(`No Product for this id : ${productId}`)
+            new ApiError(`No Product for this id : ${productId}`, 404)
           );
         }
-      });
-    }),
+      })
+    ),
+  validatorMiddleware,
 ];

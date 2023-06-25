@@ -9,6 +9,7 @@ const Order = require("../models/orderModel");
 const Cart = require("../models/cartModel");
 const User = require("../models/userModel");
 const Product = require("../models/productModel");
+const sendEmail = require("../utils/sendEmail");
 
 //@desc create cash order
 //@route POST /api/v1/orders/:cartId
@@ -48,6 +49,19 @@ exports.createCashOrder = asyncHandler(async (req, res, next) => {
     await Product.bulkWrite(bulkOptions, {});
     //5)clear cart depend on cartId
     await Cart.findByIdAndDelete(cartId);
+
+    const userOrder = await User.findById(req.user._id);
+    const emailMessage = `Hi ${userOrder.name},\n Your order has been created successfully \n 
+    you have to wait for 2 days at least before the order arrives to you \n
+    the order Price is : { ${totalOrderPrice} } containing the order cartPrice :${cartPrice}
+    and order shipping price : ${shippingPrice} 
+    and order tax price : ${taxPrice}`  ;
+    //3-send the reset code via email
+    await sendEmail({
+      to: userOrder.email,
+      subject: "Your Order has been created successfully",
+      text: emailMessage,
+    });
   }
   res.status(201).json({ status: "success", data: order });
 });
@@ -57,15 +71,15 @@ exports.filterOrderForLoggedUser = asyncHandler(async (req, res, next) => {
   next();
 });
 //@desc get all orders
-//@route GET /api/v1/orders/:cartId
+//@route GET /api/v1/orders
 //@access protected/user-admin-manager
 exports.findAllOrders = factory.getALl(Order);
 //@desc get specifi orders
-//@route GET /api/v1/orders/cartId
+//@route GET /api/v1/orders/:orderId
 //@access protected/user-admin-manager
 exports.findSpecificOrder = factory.getOne(Order);
 //@desc update order paid status to paid
-//@route PUT /api/v1/orders/:id/pay
+//@route PUT /api/v1/orders/:orderId/pay
 //@access protected/admin-manager
 exports.updateOrderToPay = asyncHandler(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
@@ -83,7 +97,7 @@ exports.updateOrderToPay = asyncHandler(async (req, res, next) => {
   res.status(200).json({ status: "success", data: updatedOrder });
 });
 //@desc update order delivered status to delivered
-//@route PUT /api/v1/orders/:id/deliver
+//@route PUT /api/v1/orders/:orderId/deliver
 //@access protected/admin-manager
 exports.updateOrderToDelivered = asyncHandler(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
@@ -137,7 +151,7 @@ exports.checkoutSession = asyncHandler(async (req, res, next) => {
       },
     ],
     mode: "payment",
-    success_url: `${req.protocol}://${req.get("host")}/orders`,
+    success_url: `${req.protocol}://${req.get("host")}`,
     cancel_url: `${req.protocol}://${req.get("host")}/cart`,
     customer_email: req.user.email,
 
@@ -153,9 +167,6 @@ const createCardOrder = async (session) => {
   const cartId = session.client_reference_id;
   const shippingAddress = session.metadata;
   const orderPrice = session.amount_total / 100;
-
-
-
 
   const cart = await Cart.findById(cartId);
   const user = await User.findOne({ email: session.customer_email });
@@ -182,6 +193,18 @@ const createCardOrder = async (session) => {
 
     //5)clear cart depend on cartId
     await Cart.findByIdAndDelete(cartId);
+
+    const emailMessage = `Hi ${user.name},\n Your order has been created successfully \n 
+    you have to wait for 2 days at least before the order arrives to you \n
+    the order Price is : { ${orderPrice} } `  ;
+    //3-send the reset code via email
+    await sendEmail({
+      to: session.customer_email,
+      subject: "Your Order has been created successfully",
+      text: emailMessage,
+    });
+
+
   }
 };
 

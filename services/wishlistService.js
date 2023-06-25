@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 
 const User = require("../models/userModel");
+const ApiError = require("../utils/apiError");
 
 //@desc add product to wishlist
 //@route POST /api/v1/wishlist
@@ -15,6 +16,9 @@ exports.addProductToWishlist = asyncHandler(async (req, res, next) => {
     },
     { new: true }
   );
+  if (!user) {
+    return ApiError("no prodcut found", 404);
+  }
   res.status(200).json({
     status: "success",
     message: "product added successfully to your wishlist",

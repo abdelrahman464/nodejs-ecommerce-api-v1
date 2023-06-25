@@ -62,8 +62,6 @@ class ApiFeatures {
       } else {
         query = { name: { $regex: this.queryStr.keyword, $options: 'i' } };
       }
-      console.log(this.queryStr.keyword)
-      console.log(query)
       this.mongooseeQuery = this.mongooseeQuery.find(query);
     }
     return this;

@@ -19,6 +19,8 @@ exports.createCouponValidator = [
         }
       })
     ),
+  check("expire").notEmpty().withMessage("Coupon expire date required"),
+  check("discount").notEmpty().withMessage("Coupon discount required"),
   validatorMiddleware,
 ];
 exports.updateCouponValidator = [

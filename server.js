@@ -1,12 +1,19 @@
 const path = require("path");
 const express = require("express");
 const mongoose = require("mongoose");
+const passport = require("passport");
 //middleware
 const morgan = require("morgan");
 //env file
 const cors = require("cors");
 const compression = require("compression");
+
+const rateLimit = require("express-rate-limit");
+
 const dotenv = require("dotenv");
+
+dotenv.config({ path: "config.env" });
+
 //database
 const dbConnection = require("./config/database");
 //route
@@ -19,16 +26,16 @@ const globalError = require("./middlewares/errorMiddleware");
 
 const { webhookCheckout } = require("./services/OrderService");
 
-dotenv.config({ path: "config.env" });
-
 //connect with database
 dbConnection();
-mongoose.set('strictQuery', false);
+mongoose.set("strictQuery", true);
 //express app
 const app = express();
 //enable other domains access your application
 app.use(cors());
 app.options("*", cors());
+
+app.use(passport.initialize());
 
 // compress all responses
 app.use(compression());
@@ -41,7 +48,12 @@ app.post(
 );
 
 //middlewares
-app.use(express.json());
+//pasring the comming data to json
+app.use(
+  express.json({
+    limit: "250kp",
+  })
+);
 //serve static files inside 'uploads'
 app.use(express.static(path.join(__dirname, "uploads")));
 
@@ -49,6 +61,16 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log(process.env.NODE_ENV);
 }
+
+// Limit each IP to 100 requests per `window` (here, per 15 minutes)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 1000,
+  message:
+    "Too many requsts created from this IP, please try again after an 15minute interval",
+});
+// Apply the rate limiting middleware to all requests
+app.use("/api", limiter);
 
 // Mount Routes
 mountRoutes(app);

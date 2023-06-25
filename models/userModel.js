@@ -18,6 +18,10 @@ const userShcema = new mongoose.Schema(
       unique: true,
       lowercase: true,
     },
+    googleId: {
+      type: String,
+      unique: true,
+    },
     phone: String,
     profileImg: String,
     password: {
@@ -65,6 +69,24 @@ userShcema.pre("save", async function (next) {
   // Hashing user password
   this.password = await bcrypt.hash(this.password, 12);
   next();
+});
+
+const setProfileImageURL = (doc) => {
+  //return image base url + iamge name
+  if (doc.profileImg) {
+    const profileImageUrl = `${process.env.BASE_URL}/users/${doc.profileImg}`;
+    doc.profileImg = profileImageUrl;
+  }
+};
+//after initializ the doc in db
+// check if the document contains image
+// it work with findOne,findAll,update
+userShcema.post("init", (doc) => {
+  setProfileImageURL(doc);
+});
+// it work with create
+userShcema.post("save", (doc) => {
+  setProfileImageURL(doc);
 });
 
 const User = mongoose.model("User", userShcema);

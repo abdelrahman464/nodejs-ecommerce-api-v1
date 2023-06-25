@@ -1,9 +1,32 @@
 const bcrypt = require("bcryptjs");
+const sharp = require("sharp");
+const { v4: uuidv4 } = require("uuid");
 const asyncHandler = require("express-async-handler");
 const ApiError = require("../utils/apiError");
 const factory = require("./handllerFactory");
 const User = require("../models/userModel");
 const generateToken = require("../utils/generateToken");
+const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
+
+//upload Singel image
+exports.uploadProfileImage = uploadSingleImage("profileImg");
+//image processing
+exports.resizeImage = asyncHandler(async (req, res, next) => {
+  const filename = `user-${uuidv4()}-${Date.now()}.jpeg`;
+
+  if (req.file) {
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 95 })
+      .toFile(`uploads/users/${filename}`);
+
+    //save image into our db
+    req.body.profileImg = filename;
+  }
+
+  next();
+});
 //@desc get list of user
 //@route GET /api/v1/users
 //@access private
@@ -26,7 +49,6 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
-      slug: req.body.slug,
       profileImg: req.body.profileImg,
       role: req.body.role,
     },
@@ -37,6 +59,7 @@ exports.updateUser = asyncHandler(async (req, res, next) => {
   if (!user) {
     return next(new ApiError(`No document For this id ${req.params.id}`, 404));
   }
+
   res.status(200).json({ data: user });
 });
 
@@ -98,6 +121,7 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
       name: req.body.name,
       email: req.body.email,
       phone: req.body.phone,
+      profileImg: req.body.profileImg,
     },
     {
       new: true,
@@ -110,12 +134,12 @@ exports.updateLoggedUserData = asyncHandler(async (req, res, next) => {
 //@access private/protect
 exports.deleteLoggedUser = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: false });
-  res.status(204).json({data:"success"});
+  res.status(204).send();
 });
 //@desc activate logged user
 //@route PUT /api/v1/user/activeMe
 //@access private/protect
 exports.activeLoggedUser = asyncHandler(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: true });
-  res.status(204).json({data:"success"});
+  res.status(201).json({ data: "success" });
 });
